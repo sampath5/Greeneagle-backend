@@ -241,7 +241,7 @@ public class UserController {
 		for (User u : usersList) {
 			if (u.getRole() == roles.USER) {
 				com.ecommerce.model.User user = new com.ecommerce.model.User(u.getUserId(), u.getEmail(),
-						u.getFirstName() + " " + u.getLastName(), false);
+						u.getFirstName() + " " + u.getLastName(), u.isActive());
 				adminSideUsersList.add(user);
 			}
 		}
