@@ -475,8 +475,8 @@ public class UserController {
 //			orderList.forEach(x->x.getOrderId());
 			try {
 				Payment payment = paypalService.createPayment(Double.valueOf(sum), "USD", "paypal", "sale",
-						cartids.toString(), "http://localhost:8080/" + CANCEL_URL,
-						"http://localhost:4200/" + SUCCESS_URL);
+						cartids.toString(), "https://eaglestore-frontend.herokuapp.com/" + CANCEL_URL,
+						"https://eaglestore-frontend.herokuapp.com/" + SUCCESS_URL);
 				for (Links link : payment.getLinks()) {
 					if (link.getRel().equals("approval_url")) {
 						System.out.println(link.getHref() + " ***");
