@@ -184,4 +184,30 @@ public class AdminController {
 		
 		
 	}
+	@PostMapping("/inActivateUser/{id}")
+	public ResponseEntity<User> inActivateUser(@PathVariable int id){
+		User user=userService.getUserById(id);
+		
+		user.setActive(false);
+		User u=userService.save(user);
+		if(u!=null) {
+			return new ResponseEntity<User>(u,HttpStatus.ACCEPTED);	
+		}else {
+			return new ResponseEntity<User>(user,HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+	
+	@PostMapping("/activateUser/{id}")
+	public ResponseEntity<User> activateUser(@PathVariable int id){
+		User user=userService.getUserById(id);
+		user.setActive(true);
+		User u=userService.save(user);
+		if(u!=null) {
+			return new ResponseEntity<User>(u,HttpStatus.ACCEPTED);	
+		}else {
+			return new ResponseEntity<User>(user,HttpStatus.BAD_REQUEST);
+		}
+		
+	}
 }

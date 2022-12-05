@@ -142,7 +142,7 @@ public class UserController {
 		user.setPassword(pwdEncoder.encode(userModel.getPassword()));
 		user.setPhoneno(userModel.getPhone());
 		user.setRole(roles.USER);
-
+		user.setActive(true);
 		user = userService.createUser(user);
 
 		Address address = new Address();
@@ -163,6 +163,11 @@ public class UserController {
 		if (error.hasErrors()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponse(
 					error.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST, null, null, null));
+		}
+		User userValidate=userService.getUserByEmail(loginDetails.getEmail());
+		if(!userValidate.isActive()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new LoginResponse("Account is Blocked.", HttpStatus.BAD_REQUEST, null, null, null));
 		}
 		Authentication authentication;
 		try {
@@ -484,7 +489,7 @@ public class UserController {
 					if (link.getRel().equals("approval_url")) {
 						System.out.println(link.getHref() + " ***");
 						plink.setLink(link.getHref());
-//						Invoice invoice=new Invoice()
+//						Invoice invoice=new Invoice();
 //						invoice.setAmount(sum);
 //						invoice.setUser(user);
 //						Invoice inv=invoiceService.saveInvoice(invoice);

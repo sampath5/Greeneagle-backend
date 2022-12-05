@@ -37,7 +37,7 @@ public class UserService {
 	public List<User> getAllUsers(){
 		return userDao.getAllUsers();
 	}
-	public void save(User user) {
-		userDao.save(user);
+	public User save(User user) {
+		return userDao.save(user);
 	}
 }

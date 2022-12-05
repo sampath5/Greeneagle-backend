@@ -19,11 +19,12 @@ public class User {
 	private String password;
 	private String phoneno;
 	private Roles role;
+	private boolean active;
 	
 	public User() {}
 		
 	public User(int userId, String firstName, String lastName, String email, String password, String phoneno,
-			Roles role) {
+			Roles role,boolean active) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -32,6 +33,7 @@ public class User {
 		this.password = password;
 		this.phoneno = phoneno;
 		this.role = role;
+		this.active=active;
 	}
 
 	public int getUserId() {
@@ -77,6 +79,14 @@ public class User {
 
 	public void setPhoneno(String phoneno) {
 		this.phoneno = phoneno;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 	
 }

@@ -41,7 +41,7 @@ public class UserDao {
 	public List<User> getAllUsers(){
 		return userRepo.findAll();
 	}
-	public void save(User user) {
-		userRepo.save(user);
+	public User save(User user) {
+		return userRepo.save(user);
 	}
 }
