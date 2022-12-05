@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,9 +26,11 @@ import com.ecommerce.entity.Order;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.Transaction;
 import com.ecommerce.entity.User;
+import com.ecommerce.enums.PaymentStatus;
 import com.ecommerce.model.LoginResponse;
 import com.ecommerce.model.Orders;
 import com.ecommerce.model.ResponseModel;
+import com.ecommerce.model.UserTransactions;
 import com.ecommerce.repository.ProductRepo;
 import com.ecommerce.service.InvoiceService;
 import com.ecommerce.service.OrderService;
@@ -153,5 +156,32 @@ public class AdminController {
 			
 		}
 		return new ResponseEntity<List<Orders>>(op,HttpStatus.ACCEPTED);
+	}
+	
+	
+	@GetMapping("/userTransactions/{id}")
+	public ResponseEntity<List<UserTransactions>> getUserTransaction(@PathVariable int id){
+		User user=userService.getUserById(id);
+		List<Invoice> invoiceList=invoiceService.getInvoiceByUser(user);
+		List<UserTransactions> userTransactions=new ArrayList<>();
+		for(Invoice inv:invoiceList) {
+			UserTransactions userTransaction=new UserTransactions();
+			userTransaction.setAmount(inv.getAmount());
+			Transaction t=transactionService.getTransaction(inv.getInvoiceId());
+			if(t.getPaymentStatus()==PaymentStatus.PAID) {
+				userTransaction.setPaymentStatus(true);	
+			}else {
+				userTransaction.setPaymentStatus(false);
+			}
+			userTransaction.setTransactionDate(t.getTransactionDate());
+			List<Order> o = orderService.getOrders(inv);
+			userTransaction.setOrders(o);
+			userTransaction.setInvoiceId(inv.getInvoiceId());
+			userTransactions.add(userTransaction);
+		}
+		return new ResponseEntity<>(userTransactions,HttpStatus.ACCEPTED);
+		
+		
+		
 	}
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.transaction.UserTransaction;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ import com.ecommerce.entity.Product;
 import com.ecommerce.entity.Transaction;
 import com.ecommerce.entity.User;
 import com.ecommerce.entity.WishList;
+import com.ecommerce.enums.PaymentStatus;
 import com.ecommerce.enums.Roles;
 import com.ecommerce.exception.OrderOutOfStockException;
 import com.ecommerce.exception.UsernameNotFoundException;
@@ -59,6 +61,7 @@ import com.ecommerce.model.ResponseModel;
 import com.ecommerce.model.UpdateUserDetails;
 import com.ecommerce.model.UpdateUserDetailsResponse;
 import com.ecommerce.model.UserSignupModel;
+import com.ecommerce.model.UserTransactions;
 import com.ecommerce.security.UserDetailsImpl;
 import com.ecommerce.security.UserDetailsServiceImpl;
 import com.ecommerce.service.CartService;
@@ -481,7 +484,7 @@ public class UserController {
 					if (link.getRel().equals("approval_url")) {
 						System.out.println(link.getHref() + " ***");
 						plink.setLink(link.getHref());
-//						Invoice invoice=new Invoice();
+//						Invoice invoice=new Invoice()
 //						invoice.setAmount(sum);
 //						invoice.setUser(user);
 //						Invoice inv=invoiceService.saveInvoice(invoice);
@@ -598,5 +601,32 @@ public class UserController {
 		}else {
 			return new ResponseEntity<>(new ResponseModel("","Bad request"),HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@GetMapping("/userTransactions")
+	public ResponseEntity<List<UserTransactions>> getUserTransaction(){
+		String email=SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+		User user=userService.getUserByEmail(email);
+		List<Invoice> invoiceList=invoiceService.getInvoiceByUser(user);
+		List<UserTransactions> userTransactions=new ArrayList<>();
+		for(Invoice inv:invoiceList) {
+			UserTransactions userTransaction=new UserTransactions();
+			userTransaction.setAmount(inv.getAmount());
+			Transaction t=transactionService.getTransaction(inv.getInvoiceId());
+			if(t.getPaymentStatus()==PaymentStatus.PAID) {
+				userTransaction.setPaymentStatus(true);	
+			}else {
+				userTransaction.setPaymentStatus(false);
+			}
+			userTransaction.setTransactionDate(t.getTransactionDate());
+			List<Order> o = orderService.getOrders(inv);
+			userTransaction.setOrders(o);
+			userTransaction.setInvoiceId(inv.getInvoiceId());
+			userTransactions.add(userTransaction);
+		}
+		return new ResponseEntity<>(userTransactions,HttpStatus.ACCEPTED);
+		
+		
+		
 	}
 }
